@@ -1,71 +1,9 @@
 import Cocoa
 //Swift no obliga a los import
 
-print(" ******************************************* PROTOCOLOS: INICIALIZADORES **************************************************  V36")
-protocol ProtoInit {
-    init ()
-    //Por conveniencia o designado 
-    //convenience init ()
-}
-
-class ClaseProPadre {
-    init() {
-        print("hola deade ClaseProPadre ")
-    }
-}
-
-class ClaseProInit : ProtoInit {
-    //requerido es obligatorio
-    required init(){
-        print("Hola mundo: se esta creando una instancia ClaseProInit")
-    }
-}
-
-class ClaseProInitH : ClaseProPadre, ProtoInit {
-    //requerido es obligatorio por el protocolo
-    //Override es obligatorio por la herencia de clase donde ya existe y se debe sobreescribir
-    required override init(){
-        print("Desde clase hija init ClaseProInitH" )
-    }
-}
-
-//var iClaseProInit = ClaseProInit()
-var iClaseProInitH = ClaseProInitH()
-//Los protocolos se pueden usar como tipos
-
-protocol GeneradorNumeroRandom_B{
-    func random() -> Double
-}
-
-class LCG_B: GeneradorNumeroRandom_B {
-    var ultimoValor : Double = 42.0 //Semilla esta se debe cambiar por ejemplo la hora
-    let m = 139968.0
-    let a : Double = 3877.0
-    let c : Double =  23673.0
-    func random() -> Double {
-        ultimoValor = (ultimoValor * a + c).truncatingRemainder(dividingBy: m)// truncatingRemainder funcion que retorna el resto de la divicion
-        return ultimoValor / m
-    }
-}
-
-class Dado {
-    let ncaras: Int
-    let generador: GeneradorNumeroRandom_B
-    init(ncaras: Int, generador :  GeneradorNumeroRandom_B) {
-        self.ncaras = ncaras
-        self.generador = generador
-    }
-    func tirar()->Int{
-        return Int(generador.random() * Double(ncaras)) + 1
-    }
-}
-
-let genA = LCG_B()
-let dadoA = Dado(ncaras: 6, generador: genA)
-for _ in 1...5 {
-    print(dadoA.tirar())
-}
-
+let cpuType = "Intel"
+var depth = 10000
+print(cpuType, depth )
 print("****************************************************CONSTANTES**************************************************")
 // Declaracion de una constante
 print("CONSTANTES: let nombreConst = valor")
@@ -2682,7 +2620,7 @@ print(trebol)
 
 //
 print(" **************************************************** PROTOCOLOS **************************************************  V35")
-//Es un modelo base que debe seguir un tipo creado  REGLAS creadas como interface de C
+//Es un modelo base que debe seguir, un protocolo es basicamente un tipo creado,  REGLAS creadas, como interface de C
 //Una Clase un Estructura o una Enumeracion puede adaptarce a un protocolo
 
 //Una clase puede usar varios protocolos
@@ -2798,3 +2736,534 @@ var interuptor = ItereruptorEncendidoApagado.apagado
 print(interuptor)
 interuptor.conmutar()
 print(interuptor)
+
+
+print(" ******************************************* PROTOCOLOS: INICIALIZADORES **********************************************  V36")
+//Como agregar inicializadores en los protocolos (required)
+
+//Algunos ejemplos
+//Protocolo de comparacion
+//Protocolo de igualdad
+//Protocolo hashecable
+
+//Se puede utilizar como tipos, elementos de arreglos, diccionarios,
+//let c: proto1 = Clase() //Ejemplo de uso como tipo
+protocol ProtoInit {
+    //La clase estructura etc que lo implemente debe tener el inicializador
+    init ()
+    //Por conveniencia o designado
+    //convenience init ()
+}
+
+class ClaseProPadre {
+    
+    init() {
+        print("hola deade ClaseProPadre ")
+    }
+}
+
+class ClaseProInit : ProtoInit {//Se adapte solo al protocolo
+    
+    //requerido es obligatorio ya que el protocolo lo obliga
+    required init(){
+        print("Hola mundo: se esta creando una instancia ClaseProInit")
+    }
+}
+
+//Clase que se adapta a un protocolo que contiene un inicializador
+let ejemploProtoInitClaseProint = ClaseProInit()
+
+//Clase hija que hereda de una clase padre y a su vez se adapta al protocolo
+class ClaseProInitH : ClaseProPadre, ProtoInit {//Ademas de adaptarce al el protoclo debe mantener la herencia
+    //requerido es obligatorio por el protocolo
+    //Override es obligatorio por la herencia de clase donde ya existe y se debe sobreescribir
+    required override init(){
+        print("Desde clase hija init ClaseProInitH  required (Protocolo) override (Clase padre) " )
+    }
+}
+
+//var iClaseProInit = ClaseProInit()
+var iClaseProInitH = ClaseProInitH()
+//Los protocolos se pueden usar como tipos
+
+protocol GeneradorNumeroRandom_B{
+    func random() -> Double
+}
+
+class LCG_B: GeneradorNumeroRandom_B {
+    var ultimoValor : Double = 42.0 //Semilla esta se debe cambiar por ejemplo la hora
+    let m = 139968.0
+    let a : Double = 3877.0
+    let c : Double =  23673.0
+    func random() -> Double {
+        ultimoValor = (ultimoValor * a + c).truncatingRemainder(dividingBy: m)// truncatingRemainder funcion que retorna el resto de la divicion
+        return ultimoValor / m
+    }
+}
+
+class Dado {
+    let ncaras: Int
+    let generador: GeneradorNumeroRandom_B
+    init(ncaras: Int, generador :  GeneradorNumeroRandom_B) {
+        self.ncaras = ncaras
+        self.generador = generador
+    }
+    func tirar()->Int{
+        return Int(generador.random() * Double(ncaras)) + 1
+    }
+}
+
+let genA = LCG_B()
+let dadoA = Dado(ncaras: 6, generador: genA)
+for _ in 1...5 {
+    print(dadoA.tirar())
+}
+
+print(" ******************************************* PROTOCOLOS: DELEGATE *************************************************  V37")
+//Dejar PROTOCOLOS: INICIALIZADORES para pruebas
+//Patrones de diseno: Patron de delegacion, delegamos funciones
+
+//Juego de dados
+protocol JuegoDados {
+    var dado : Dado {get}  //solo lectura
+    
+    func jugar()
+}
+
+protocol JuegoDadosDelegate{
+    
+    //Con los parametros se deduce el comportamieno
+    func juegoIniciado(_ juego : JuegoDados) //Comienza la partida
+    func juegoTerminado(_ juego : JuegoDados) //Termina la partida
+    func juego(_ juego : JuegoDados, nuevoTurnoConNumero numero: Int ) //Juego en un nuevo turno
+}
+
+class CaminoDeDados: JuegoDados{
+    let longitud: Int
+    var dado: Dado
+    
+    
+    var delegate : JuegoDadosDelegate?
+    
+    init (longitud : Int , dado: Dado){
+        self.longitud = longitud
+        self.dado = dado
+    }
+    func jugar (){
+        var conteo = 0
+        delegate?.juegoIniciado(self)
+        
+        while conteo < longitud {
+            let numero = dado.tirar()
+            delegate?.juego(self, nuevoTurnoConNumero: numero)
+            conteo += numero
+        }
+        
+        delegate?.juegoTerminado(self)
+        
+    }
+}
+
+//La idea es que el delegado sea algo q no necesaria mente nosotros desarrollamos si no que sea el trabajo delegado a otro servicios
+class ContabilizadorDeJuegoDados: JuegoDadosDelegate{
+    
+    var numeroTurnos = 0
+    func juegoIniciado(_ juego : JuegoDados) {
+        if juego is CaminoDeDados {
+            print("Se esta inciciando una partida de dados")
+        }
+        print("Es partida comienza con : \(juego.dado.ncaras) caras")
+    }
+    func juegoTerminado(_ juego : JuegoDados) {
+        print("el juego termina con un total \(numeroTurnos) turno")
+    }
+    func juego(_ juego : JuegoDados, nuevoTurnoConNumero numero: Int ){
+        print("Se esta jugando el turno donde el dado vale \(numero) en el turno \(numeroTurnos)")
+        numeroTurnos += 1
+    }
+}
+
+//EJECUCUION
+let dado = Dado(ncaras: 6, generador: LCG_B())
+let juego = CaminoDeDados(longitud: 17, dado: dado)
+let contabilizador = ContabilizadorDeJuegoDados()
+//juego.delegate = contabilizador
+//Aqui el delegado se puede quitar o poner otro y seguira corriendo el programa.
+juego.delegate = contabilizador
+juego.jugar()
+
+print(" ******************************************* PROTOCOLOS: Extension ************************************************  V38")
+//Que una clase se conforme a un protocolo cuando originalmente no se hacia
+//Ejemplo cuando tenemos una libreria y no tenemos el codigo
+
+protocol RepresentableConTexto{
+    var descripcionTextual: String {get}
+}
+
+//Dado ya existe pero se quiere que se adapte a un nuevo protocolo en este caso RepresentableConTexto.
+extension Dado: RepresentableConTexto{
+    var descripcionTextual: String {
+        return "Un dado con \(self.ncaras) caras"
+    }
+}
+
+let dadoDoce = Dado(ncaras: 12, generador: LCG_B())
+print(dadoDoce.descripcionTextual)
+
+//Otra forma de extende la clase que no se ajusta al protocolo
+class Hamster{
+    var nombre: String
+    var descripcionTextual : String {
+        return "Un  Hamster llamado \(self.nombre)"
+    }
+    
+    init(nombre: String){
+        self.nombre = nombre
+    }
+}
+
+//Extendemos la clase
+extension Hamster: RepresentableConTexto {
+    //No hace falta el cuerpo por que ya la clase Hamster contiene descripcionTextual no hace falta redefinir
+}
+print("\n")
+let carlosHamster : RepresentableConTexto = Hamster(nombre: "Carlos")
+print(carlosHamster.descripcionTextual)
+
+
+
+extension CaminoDeDados: RepresentableConTexto {
+    var descripcionTextual : String {
+        return "Camino de dados, con \(self.dado.descripcionTextual)"
+    }
+}
+
+//Lista de RepresentableConTexto
+print("\n")
+var cosas : [RepresentableConTexto] = [
+    Dado(ncaras: 10, generador: LCG_B()),
+    Hamster(nombre: "Carlos"),
+    CaminoDeDados(longitud: 17, dado: Dado(ncaras: 16, generador: LCG_B()))
+]
+
+for cosa in cosas {
+    print(cosa.descripcionTextual)
+}
+
+
+print(" ******************************************* PROTOCOLOS: HERENCIA ************************************************* V39")
+//Jueves 6 de Julio del 2023
+
+//Herencia de protocolos: Si un protocolo hereda de otro protocolo, la clase que se conforme al protocolo con herencia debe conformarce a todo lo que esta en el protocolo(HIJO) ojo y mas todo lo que esta en el protocolo (PADRE).
+//Se debe implementar todo lo de A y B
+
+//La herencia en protocolos es multiple usando coma(,)
+//protocol DescriptiblePadre : DescriptibleHijo{}
+
+
+//protocol RepresentableConTexto{
+//    var descripcionTextual: String {get}
+//}
+
+
+protocol Descriptible: RepresentableConTexto{
+    var descripcionResumida: String {get}
+}
+
+//Se cre la variable nueva para que se adapte al protocolo Descriptible
+extension Dado: Descriptible{
+    var descripcionResumida: String {
+        return "Un dado"
+    }
+}
+
+
+extension CaminoDeDados: Descriptible {
+    var descripcionResumida : String {
+        return "Camino de dados con extension descriptible"
+    }
+}
+
+//Instancia de dado q se adapta a un protocolo heredado
+let dado16Caras = Dado(ncaras: 16, generador: LCG_B())
+print(dado16Caras.descripcionResumida)
+let juegoCaminoDelDado = CaminoDeDados(longitud: 16, dado: dado16Caras)
+//Esta es la extencion del protocolo
+print(juegoCaminoDelDado.descripcionResumida)
+//Este es el primer protocolo
+print(juegoCaminoDelDado.descripcionTextual)
+
+print(" ************************PROTOCOLOS: HERENCIA forzado a ser conformados por clases****** V39")
+//Para forzar que un protocolo se adapte solo a una Clase y no a otros tipos como estructuras
+protocol DescriptibleForzado: class, RepresentableConTexto{
+    var descripcionResumudaForzado: String {get}
+}
+
+struct PruebaStructuraP {
+    var nombre: String
+    var descripcionTextual : String {
+        return "Un  Hamster llamado \(self.nombre)"
+    }
+}
+
+class PruebaSClaseP  {
+    var nombre: String = ""
+    var descripcionTextual : String {
+        return "Un  Hamster llamado \(self.nombre)"
+    }
+}
+
+//Para este caso da error por que no es una clase
+//extension PruebaStructuraP: DescriptibleForzado {
+//  var descripcionResumudaForzado : String {
+//    return "Esta es una prueba para que el protocolo solo sea forzado a una clase"
+//}
+//}
+extension PruebaSClaseP: DescriptibleForzado {
+    var descripcionResumudaForzado : String {
+        return "Esta es una prueba para que el protocolo solo sea forzado a una clase"
+    }
+}
+
+let pruebaForzado = PruebaSClaseP()
+print(pruebaForzado.descripcionTextual)
+print(pruebaForzado.descripcionResumudaForzado)
+
+
+
+print(" ************************PROTOCOLOS:Una variable o elemento se conforme a dos protocolos  elementos o mas, hacer un casting a protocolo recorrer****** V39")
+protocol Nombrabel {
+    var nombre : String {get set}
+}
+protocol ConEdad {
+    var edad : Int {get set}
+}
+class Extranjetro: Nombrabel, ConEdad {
+    var nombre : String
+    var edad : Int
+    
+    init (nombre : String, edad : Int){
+        self.nombre = nombre
+        self.edad = edad
+    }
+}
+
+//Esto es una composicion Nombrabel & ConEdad
+//Este caso esta variable se conforma a dos protocolos
+//Esta funcion puede recivir muchos tipos una planta un animal una persona etc
+func desearFelizCumple(a individuo: Nombrabel & ConEdad){
+    print("Feliz cumpleaños \(individuo.nombre), ya tienes \(individuo.edad) años")
+}
+let extraCarlos = Extranjetro(nombre :"Javier", edad :30)
+desearFelizCumple(a:extraCarlos)
+
+///EJEMPLO con dos protocolos para una variable
+protocol TieneArea {
+    var area: Double {get}
+}
+
+class Circulo : TieneArea {
+    let pi = 3.1415927
+    var radio: Double
+    var area : Double {
+        return pi*radio*radio
+    }
+    init (radio : Double){
+        self.radio = radio
+    }
+}
+
+class PaisAmericano : TieneArea {
+    var area: Double
+    init (area: Double){
+        self.area = area
+    }
+}
+
+class AnimalZoo {
+    var patas: Int
+    init (patas: Int){
+        self.patas = patas
+    }
+}
+
+var objetosVarios : [AnyObject] = [Circulo(radio: 15), AnimalZoo(patas: 4), PaisAmericano(area: 5000)]
+for obj in objetosVarios {
+    if obj is TieneArea {
+        print("Es un elemento con Area")
+        if let objCir = obj as? Circulo {
+            print("El Area mide: \(objCir.area)")
+        }
+        if let objPais = obj as? PaisAmericano {
+            print("El Area mide: \(objPais.area)")
+        }
+    }else{
+        print("Elemento sin Area ")
+    }
+}
+
+//Otra forma mas elegante
+for obj in objetosVarios {
+    if let objConArea = obj as? TieneArea {
+        print("Es un elemento con Area: \(objConArea.area)")
+    }else{
+        print("Elemento sin Area ")
+    }
+}
+
+print(" ************************PROTOCOLOS: Con propiedades y metodos opcionales****** V40")
+
+//@objc Derivacion de Objective C
+@objc protocol FuenteDeContador {
+    @objc optional func incrementar (porCantidad cantidad : Int)-> Int
+    
+    @objc  optional var incrementoFijo: Int {get}
+}
+
+class ContadorPO {
+    var conteo : Int = 0
+    var fuente : FuenteDeContador?
+    
+    func incremento(){
+        if let cantidad = fuente?.incrementar?(porCantidad: conteo){
+            conteo += cantidad
+        }
+        else if let cantidad = fuente?.incrementoFijo {
+            conteo += cantidad
+        }
+    }
+    func decremento(){
+        if let cantidad = fuente?.incrementar?(porCantidad: conteo){
+            conteo = cantidad
+        }
+        else if let cantidad = fuente?.incrementoFijo {
+            conteo += cantidad
+        }
+    }
+}
+
+class FuenteTres: NSObject,FuenteDeContador {
+    var incrementoFijo: Int = 3
+}
+
+class HaciaCero: NSObject,FuenteDeContador {
+    func incrementar (porCantidad cantidad : Int)-> Int{
+        if cantidad < 0 {
+            return cantidad + 1
+        }else if cantidad == 0 {
+            return 0
+            
+        }else {
+            return cantidad - 1
+        }
+    }
+}
+print("******EJEMPO CONTEO DE TRES ***")
+let contadorTres = ContadorPO()
+contadorTres.fuente = FuenteTres()
+
+for _ in 1...4 {
+    contadorTres.incremento()
+    print(contadorTres.conteo)
+}
+
+print("******EJEMPO CONTEO DE TRES***")
+let contadorH0 = ContadorPO()
+contadorH0.conteo = 10
+contadorH0.fuente = HaciaCero()
+
+for _ in 1...4 {
+    contadorH0.incremento()
+    print(contadorH0.conteo)
+}
+
+for _ in 1...4 {
+    contadorH0.decremento()
+    print(contadorH0.conteo)
+}
+
+print(" ************************PROTOCOLOS: Extencion de protocolos****** V40")
+//Jueves 13/Julio/2023
+//protocolo GeneradorNumeroRandom tiene un generador de numeros double vamos a agragar que genere Bool aleatorio
+//Protocolo GeneradorNumeroAleatorio
+protocol GeneradorNumeroAleatorio{
+    func random() -> Double
+}
+
+//Extencion del protocolo GeneradorNumeroAleatorio
+extension GeneradorNumeroAleatorio{
+    //Se debe crear la implementacion por defecto
+    func randomBool () -> Bool {
+        return random() > 0.5
+    }
+}
+
+//Clase que se ajusta al protocolo GeneradorNumeroAleatorio
+class LCG_A: GeneradorNumeroAleatorio {
+    var ultimoValor : Double = 42.0 //Semilla esta se debe cambiar por ejemplo la hora
+    let m = 139968.0
+    let a : Double = 3877.0
+    let c : Double =  23673.0
+    
+    func random() -> Double {
+        ultimoValor = (ultimoValor * a + c).truncatingRemainder(dividingBy: m)// truncatingRemainder funcion que retorna el resto de la divicion
+        return ultimoValor / m
+    }
+    
+    //No es necesario implementar ya que hay una por defecto en la extencion pero se puede perfectamente cambiar e implementar una nueva como este ejemplo (se puede comentar para probar). Y esta sera la prioridad.
+    func randomBool () -> Bool {
+        return random() <= 0.5
+    }
+}
+
+//Intancia de la clase
+let generador_A = LCG_A()
+for _ in 1...7{
+    print(generador_A.randomBool())
+    print(generador_A.random())
+}
+
+print(" ************************PROTOCOLOS: Extencion donde se agregan limitaciones ****** V40")
+//Jueves 13/Julio/2023
+protocol RepresentableConTextoC{
+    var descripcionTextual: String {get}
+}
+protocol DescriptibleC:  class,  RepresentableConTextoC{
+    var descripcionResumida: String {get}
+}
+
+class HamsterC: DescriptibleC{
+    var nombre: String
+    var descripcionTextual : String {
+        return "Un  Hamster llamado \(self.nombre)"
+    }
+    var descripcionResumida : String {
+        return "Hamster \(self.nombre)"
+    }
+    
+    init(nombre: String){
+        self.nombre = nombre
+    }
+}
+//El protocolo Collection indica que los objetos pertenecen a una coleccion como lo son os Arreglos, Dicionarios, Conjuntos
+//Itereitor: que es iterable este protocolo forma parte de Collection
+extension Collection where Iterator.Element: DescriptibleC{
+    //Cada elemento de la coleccion iterable tiene como limitacion que debe ser descriptible
+    
+    var descripcionResumida: String {
+        return "Una coleccion"
+    }
+    var descripcionTextual: String {
+        let itemsComoTexto = self.map {$0.descripcionTextual}
+        return "[ " + itemsComoTexto.joined(separator: ", ") + " ]"
+    }
+}
+
+let hamsters = [
+    HamsterC(nombre: "Fido"),
+    HamsterC(nombre: "Riringo"),
+    HamsterC(nombre: "Pinki"),
+    HamsterC(nombre: "Suki")
+]
+
+print(hamsters.descripcionTextual)
